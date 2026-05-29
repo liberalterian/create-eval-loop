@@ -1,0 +1,56 @@
+name: example-level-anchor-rubric
+version: 1.0.0
+description: Level-anchor rubric template for qualitative dimensions.
+scope:
+  type: content
+rubric_type: level_anchor
+scoring:
+  scale: 0-100
+  aggregation: weighted_average
+  threshold: 80
+  per_criterion_floor: 60
+  max_rounds: 3
+criteria:
+  tone_match:
+    weight: 40
+    threshold: 75
+    description: The output matches the target tone.
+    method: level_anchor
+    anchors:
+      100: Fully matches the target tone throughout; no sentence feels off-brand.
+      75: Mostly matches the target tone; one or two minor mismatches.
+      50: Mixed tone; several sections match but others drift noticeably.
+      25: Mostly mismatched tone; only isolated phrases fit.
+      0: No recognizable match to the requested tone.
+    message: Rewrite only the mismatched passages using the target tone examples.
+  audience_fit:
+    weight: 35
+    threshold: 75
+    description: The output is appropriate for the intended audience.
+    method: level_anchor
+    anchors:
+      100: Assumptions, examples, and vocabulary are consistently appropriate for the audience.
+      75: Mostly appropriate, with a few terms or examples that need adjustment.
+      50: Understandable but not clearly tailored to the audience.
+      25: Frequently mismatched to audience needs or knowledge level.
+      0: Inappropriate for the audience.
+    message: Adjust examples, detail level, and vocabulary for the intended reader.
+  distinctiveness:
+    weight: 25
+    threshold: 65
+    description: The output avoids generic phrasing and includes specific, differentiating details.
+    method: level_anchor
+    anchors:
+      100: Highly specific and memorable; avoids generic claims.
+      75: Specific in most places; a few generic phrases remain.
+      50: Some useful specifics but relies on familiar templates.
+      25: Mostly generic; few distinctive details.
+      0: Entirely generic or interchangeable.
+    message: Replace generic phrases with concrete details, examples, or sharper positioning.
+passing:
+  min_score: 80
+  required_criteria:
+    - tone_match
+reporting:
+  save_history: true
+  output_dir: .claude/eval-results/example-level-anchor-rubric

@@ -1,0 +1,62 @@
+name: readme-section-quality
+version: 1.0.0
+description: Evaluates whether a README section is complete and usable.
+scope:
+  type: content
+rubric_type: hybrid
+scoring:
+  scale: 0-100
+  aggregation: weighted_average
+  threshold: 80
+  per_criterion_floor: 60
+criteria:
+  completeness:
+    weight: 40
+    threshold: 75
+    description: The section includes the information a reader needs.
+    method: checklist
+    checks:
+      - id: heading
+        type: regex
+        value: "^##\\s+"
+        statement: A second-level markdown heading is present.
+        message: Add a clear markdown heading.
+      - id: command
+        type: contains
+        value: "install"
+        statement: Installation or setup instructions are present.
+        message: Add an install/setup command or instruction.
+  usability:
+    weight: 40
+    threshold: 75
+    description: The section can be followed without guessing.
+    method: checklist
+    checks:
+      - id: no-todo
+        type: not_contains
+        value: "TODO"
+        statement: No placeholder TODO text remains.
+        message: Replace TODO placeholders with final instructions.
+      - id: sufficient-detail
+        type: min_length
+        value: 40
+        statement: The section has enough detail to be useful.
+        message: Add enough detail for a reader to take action.
+  clarity:
+    weight: 20
+    threshold: 60
+    description: The section is clear and concise.
+    method: level_anchor
+    anchors:
+      100: Clear, concise, and immediately actionable.
+      75: Mostly clear with minor wording issues.
+      50: Understandable but incomplete or wordy.
+      25: Hard to follow.
+      0: Not meaningful.
+passing:
+  min_score: 80
+  required_criteria:
+    - completeness
+reporting:
+  save_history: true
+  output_dir: .claude/eval-results/readme-section-quality

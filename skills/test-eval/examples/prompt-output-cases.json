@@ -1,0 +1,25 @@
+[
+  {
+    "id": "good-readme-section",
+    "description": "A useful README section should have a heading, install command, and no placeholders.",
+    "input": "Write a README installation section.",
+    "output": "## Installation\n\nRun `npm install` and then `npm run dev` to start the local server.",
+    "assertions": [
+      {"type": "regex", "value": "^##\\s+Installation"},
+      {"type": "contains", "value": "npm install"},
+      {"type": "not_contains", "value": "TODO"},
+      {"type": "min_length", "value": 40}
+    ]
+  },
+  {
+    "id": "bad-placeholder",
+    "description": "Placeholder output should fail.",
+    "input": "Write a README installation section.",
+    "output": "TODO: add installation instructions later.",
+    "assertions": [
+      {"type": "not_contains", "value": "TODO"},
+      {"type": "contains", "value": "install"},
+      {"type": "min_length", "value": 40}
+    ]
+  }
+]

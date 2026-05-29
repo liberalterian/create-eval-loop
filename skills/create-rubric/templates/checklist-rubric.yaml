@@ -1,0 +1,115 @@
+name: example-checklist-rubric
+version: 1.0.0
+description: Checklist rubric template using weighted observable checks.
+scope:
+  type: content
+  file_patterns:
+    - "*.md"
+rubric_type: checklist
+scoring:
+  scale: 0-100
+  aggregation: weighted_average
+  threshold: 85
+  per_criterion_floor: 70
+  max_rounds: 4
+  convergence:
+    min_delta: 2
+    patience: 2
+criteria:
+  task_fulfillment:
+    weight: 30
+    threshold: 80
+    description: The output satisfies the user's explicit request.
+    method: checklist
+    checks:
+      - id: addresses-request
+        type: binary
+        statement: The output directly addresses the main user request.
+        message: Revise the output so it directly answers the request before adding extra context.
+      - id: covers-components
+        type: binary
+        statement: The output covers every required component named by the user.
+        message: Add the missing requested components.
+      - id: no-unrequested-detour
+        type: binary
+        statement: The output avoids large unrelated sections.
+        message: Remove or compress sections that are not necessary for the task.
+    examples:
+      pass: All requested sections are present and clearly labeled.
+      fail: The answer gives general advice but omits one requested deliverable.
+  accuracy_grounding:
+    weight: 30
+    threshold: 80
+    description: Claims are accurate, grounded, and appropriately caveated.
+    method: checklist
+    checks:
+      - id: no-obvious-false-claims
+        type: binary
+        statement: The output contains no obvious unsupported or false claims.
+        message: Remove or verify unsupported factual claims.
+      - id: citations-where-needed
+        type: binary
+        statement: Non-obvious factual claims include citations or evidence where required.
+        message: Add citations or source-grounded rationale for factual claims.
+      - id: uncertainty-stated
+        type: binary
+        statement: The output states uncertainty instead of guessing when information is incomplete.
+        message: Add an uncertainty note for any assumption or incomplete information.
+    examples:
+      pass: Source-dependent claims include citations and assumptions are labeled.
+      fail: The output asserts current facts without checking or citing them.
+  usability:
+    weight: 25
+    threshold: 75
+    description: The output is easy to use, review, run, or copy.
+    method: checklist
+    checks:
+      - id: clear-structure
+        type: binary
+        statement: The output is organized with clear headings or sections.
+        message: Add headings and reorder the output for usability.
+      - id: concrete-next-actions
+        type: binary
+        statement: The output includes concrete next actions or deliverables.
+        message: Add specific next actions or make the deliverable directly usable.
+      - id: implementation-ready
+        type: binary
+        statement: Technical instructions or files are complete enough to implement.
+        message: Add missing commands, file paths, or schema details.
+    examples:
+      pass: The answer includes paths, commands, and a clear order of operations.
+      fail: The answer is conceptually useful but not actionable.
+  format_compliance:
+    weight: 15
+    threshold: 90
+    description: The output follows required format and style constraints.
+    method: checklist
+    checks:
+      - id: follows-requested-format
+        type: binary
+        statement: The output uses the requested file, markdown, JSON, or response format.
+        message: Reformat the output to match the requested format exactly.
+      - id: no-forbidden-content
+        type: binary
+        statement: The output avoids any forbidden sections, tools, or content types.
+        message: Remove content that violates explicit constraints.
+      - id: concise-enough
+        type: binary
+        statement: The output is no longer than needed for the user's task.
+        message: Tighten repetitive or low-value content.
+    examples:
+      pass: The file compiles/parses and uses the requested structure.
+      fail: The output includes commentary where the user requested JSON only.
+passing:
+  min_score: 85
+  required_criteria:
+    - task_fulfillment
+    - format_compliance
+  critical_barriers:
+    - id: fabricated-source
+      criterion: accuracy_grounding
+      condition: Any fabricated citation or source reference is present.
+      consequence: Fail output and require correction before acceptance.
+reporting:
+  save_history: true
+  output_dir: .claude/eval-results/example-checklist-rubric

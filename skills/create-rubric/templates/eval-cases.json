@@ -1,0 +1,22 @@
+[
+  {
+    "id": "markdown-heading-present",
+    "description": "Output should include a top-level markdown heading.",
+    "input": "Create a short implementation plan.",
+    "output": "# Implementation Plan\n\n1. Define scope.\n2. Build prototype.",
+    "assertions": [
+      {"type": "regex", "value": "^#\\s+.+"},
+      {"type": "contains", "value": "Implementation"}
+    ]
+  },
+  {
+    "id": "no-placeholder-text",
+    "description": "Output should not contain obvious placeholders.",
+    "input": "Create a final-ready README section.",
+    "output": "# Setup\n\nReplace this with your setup instructions.",
+    "assertions": [
+      {"type": "not_contains", "value": "Replace this"},
+      {"type": "not_contains", "value": "TODO"}
+    ]
+  }
+]
