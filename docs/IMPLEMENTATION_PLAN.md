@@ -1,7 +1,16 @@
 # Implementation Plan — Rubric Eval Loop Plugin
 
-Status: approved (plan-only round). Work tracked on branch
-`claude/eval-loop-rubric-features-YA7IJ`.
+Status: all milestones (M0–M4) implemented on branch
+`claude/eval-loop-rubric-features-YA7IJ`. This document is the original plan;
+the milestone checklist below reflects completion.
+
+| Milestone | Workstream | Status |
+|---|---|---|
+| M0 | WS0 foundation + bugfixes | done |
+| M1 | WS1 composite sections | done |
+| M2 | WS3 dual-mode loop | done |
+| M3 | WS2 sign-off + grounding | done |
+| M4 | WS4 build-eval-loop orchestrator | done |
 
 ## Locked decisions
 
