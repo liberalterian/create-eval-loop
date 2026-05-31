@@ -37,9 +37,11 @@ Required:
 
 1. **Target skill path** — e.g. `.claude/skills/research-writer/SKILL.md`.
 2. **Rubric path or rubric intent** — existing `.yaml` or a description to create one.
-3. **Loop mode** — markdown-only, script-backed, or hybrid.
-4. **Thresholds** — default `overall >= 85`, `floor >= 70`, max rounds `4`.
-5. **Acceptance behavior** — return final output, return final + report, or stop for human review.
+3. **Loop mode** — markdown-only, script-backed, or hybrid (how the gate is embedded).
+4. **Iteration target** — `output` (optimize one artifact until it passes) or `skill` (optimize the SKILL.md itself). Default `output`.
+5. **Automation** — `agent` (scripts emit a prompt; Claude/you apply the fix) or `autonomous` (a model CLI closes the loop). Default `agent`.
+6. **Thresholds** — default `overall >= 85`, `floor >= 70`, max rounds `4`.
+7. **Acceptance behavior** — return final output, return final + report, or stop for human review.
 
 Optional:
 
@@ -81,6 +83,24 @@ Create:
 ### Hybrid mode
 
 Use when deterministic assertions cover format/schema and LLM-as-judge covers content quality.
+
+### Iteration target and automation (orthogonal to loop mode)
+
+`scripts/improve_skill_loop.py` exposes two independent dimensions:
+
+- **`--mode output`** rewrites a single output artifact (`--target <file>`)
+  until it passes the rubric. **`--mode skill`** rewrites the target
+  `SKILL.md` so it produces better outputs.
+- **Automation:** by default the loop runs in *agent mode* — it writes an
+  improvement prompt under `eval/results/` and exits with code `2` for Claude
+  Code (or you) to apply, then re-runs. Pass **`--autonomous --model-cmd
+  "claude -p"`** to close the loop with a model CLI (the prompt is fed on
+  stdin; its stdout replaces the target). Autonomous mode fails soft to agent
+  mode when no model CLI is found. You can also supply your own
+  **`--apply-cmd`** for a custom closed loop.
+
+Defaults stay conservative: `output` + agent. Choose `skill` and/or
+`autonomous` only when the user asks for self-improvement or unattended runs.
 
 Patch `SKILL.md`, add scripts, and link a YAML rubric in `.claude/evals/`.
 
@@ -252,7 +272,21 @@ python .claude/skills/add-eval-loop/scripts/patch_skill_eval_loop.py \
   --floor 70
 ```
 
-The helper creates an idempotent eval section and optional script scaffold.
+The helper creates an idempotent eval section and, for script-backed/hybrid
+mode, vendors `eval_core.py` + the runner scripts into the target.
+
+To drive iteration after scaffolding, use the loop runner. Agent mode (default)
+writes an improvement prompt and exits `2` for you/Claude to apply; add
+`--autonomous` to close the loop with a model CLI:
+
+```bash
+python .claude/skills/<skill>/scripts/improve_skill_loop.py \
+  --mode output \                 # or: skill (optimize the SKILL.md itself)
+  --target <artifact-or-SKILL.md> \
+  --cases .claude/skills/<skill>/eval/eval-cases.json \
+  --threshold 0.95 --max-iterations 4 \
+  # --autonomous --model-cmd "claude -p"
+```
 
 ## Internal quality checklist
 

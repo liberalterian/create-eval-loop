@@ -58,6 +58,22 @@ AND no critical barrier is triggered
 - Do not hide evaluator uncertainty.
 - Keep a brief score history when scripts or files are available.
 
+### Running the scripted gate (script-backed / hybrid)
+
+Bundled scripts are referenced via `${{{{CLAUDE_SKILL_DIR}}}}` so they run regardless
+of the current working directory:
+
+```bash
+python "${{{{CLAUDE_SKILL_DIR}}}}/scripts/eval_runner.py" \\
+  "${{{{CLAUDE_SKILL_DIR}}}}/eval/eval-cases.json" \\
+  --out "${{{{CLAUDE_SKILL_DIR}}}}/eval/results/latest.json"
+
+# Iterate. Agent mode (default) writes an improvement prompt and stops;
+# add --autonomous --model-cmd "claude -p" to close the loop.
+python "${{{{CLAUDE_SKILL_DIR}}}}/scripts/improve_skill_loop.py" \\
+  --mode output --target <artifact> --threshold 0.95
+```
+
 {END}
 """
 
