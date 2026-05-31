@@ -10,7 +10,8 @@ rubric-eval-loop-plugin/
 │   └── manifest.json
 ├── skills/
 │   ├── _shared/
-│   │   └── eval_core.py        # shared assertion + scoring engine
+│   │   ├── eval_core.py        # shared assertion + scoring engine
+│   │   └── feedback.py         # sign-off / expert-feedback audit trail
 │   ├── create-rubric/
 │   │   ├── SKILL.md
 │   │   ├── templates/

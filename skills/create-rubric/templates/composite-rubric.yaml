@@ -8,6 +8,16 @@ scope:
   type: content
   file_patterns:
     - "*.md"
+# Optional grounding block. Expert references and notes are read as context when
+# drafting and applying the rubric, and surfaced at sign-off checkpoints.
+context:
+  references:
+    - path: ./docs/style-guide.md
+      note: Brand tone and voice reference.
+    - path: ./examples/gold-standard/*.md
+      note: Exemplar outputs that should score near 100.
+  expert_notes: |
+    Prefer active voice. Lead with the recommendation. Avoid internal jargon.
 rubric_type: composite
 scoring:
   scale: 0-100

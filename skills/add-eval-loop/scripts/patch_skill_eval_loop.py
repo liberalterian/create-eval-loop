@@ -107,6 +107,7 @@ def scaffold_scripts(skill_dir: Path) -> None:
     # self-contained and runnable without the plugin on the path.
     for src in (
         _SHARED_DIR / "eval_core.py",
+        _SHARED_DIR / "feedback.py",
         _SCRIPTS_DIR / "eval_runner.py",
         _SCRIPTS_DIR / "improve_skill_loop.py",
     ):

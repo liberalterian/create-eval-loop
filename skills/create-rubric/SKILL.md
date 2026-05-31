@@ -46,6 +46,7 @@ Collect:
 4. **Strictness** — suggested defaults: draft 60, PR/review 75, production 85, critical 90+.
 5. **Rubric type** — checklist, level anchors, binary assertions, hybrid, pairwise, batch, test-driven.
 6. **Hard stops** — any critical barrier that should fail the output regardless of total score.
+7. **Expert grounding** — any style guides, exemplars, or expert notes. Record these in the rubric's optional `context` block (`context.references[].path`, `context.expert_notes`) and read referenced files before drafting criteria so the rubric reflects them.
 
 ### Phase 2 — Choose the rubric design
 
@@ -168,6 +169,22 @@ When script access is available, run:
 ```bash
 python .claude/skills/create-rubric/scripts/validate_rubric.py <path-to-rubric.yaml>
 ```
+
+### Phase 7.5 — Sign-off checkpoint (draft criteria)
+
+Before finalizing, surface the drafted criteria, weights, thresholds, and any
+critical barriers and use `AskUserQuestion` to get approve / edit / reject. This
+checkpoint matters most when expert grounding was provided — confirm the rubric
+faithfully encodes it. Record the decision and any expert feedback:
+
+```bash
+python .claude/skills/_shared/feedback.py \
+  --rubric <name> --stage draft-criteria --decision <approve|edit|reject> \
+  --text "<expert feedback>"
+```
+
+Run sign-off **inline** (never `context: fork`), since `AskUserQuestion` needs
+the live conversation. Apply requested edits and re-validate before continuing.
 
 ### Phase 8 — Final response
 

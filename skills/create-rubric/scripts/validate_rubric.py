@@ -81,6 +81,32 @@ def _validate_criteria(criteria: Any, default_method: str | None, label: str, er
     return total_weight
 
 
+def _validate_context(context: Any) -> list[str]:
+    """Validate the optional ``context`` grounding block (expert references and
+    notes). Absent context is valid; a present block must be well-formed."""
+    errors: list[str] = []
+    if context is None:
+        return errors
+    if not isinstance(context, dict):
+        errors.append("context must be an object")
+        return errors
+    references = context.get("references")
+    if references is not None:
+        if not isinstance(references, list):
+            errors.append("context.references must be a list")
+        else:
+            for i, ref in enumerate(references):
+                if not isinstance(ref, dict):
+                    errors.append(f"context.references[{i}] must be an object")
+                    continue
+                if not ref.get("path") or not isinstance(ref.get("path"), str):
+                    errors.append(f"context.references[{i}] missing non-empty string path")
+    notes = context.get("expert_notes")
+    if notes is not None and not isinstance(notes, str):
+        errors.append("context.expert_notes must be a string")
+    return errors
+
+
 def validate(data: dict[str, Any]) -> list[str]:
     errors: list[str] = []
     has_sections = isinstance(data.get("sections"), dict) and data.get("sections")
@@ -138,6 +164,8 @@ def validate(data: dict[str, Any]) -> list[str]:
             errors.append("passing.min_score must be numeric")
     else:
         errors.append("passing must be an object")
+
+    errors.extend(_validate_context(data.get("context")))
 
     return errors
 

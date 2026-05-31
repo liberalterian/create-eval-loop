@@ -98,6 +98,37 @@ section's criteria weights sum to 100. See
 `skills/_shared/eval_core.py::normalize_sections` and `score_rubric` for the
 reference implementation.
 
+## Expert grounding and sign-off
+
+A rubric may carry an optional `context` block that grounds it in expert
+material. References and notes are read as context when drafting and applying
+the rubric, and are surfaced to the human at sign-off checkpoints.
+
+```yaml
+context:
+  references:
+    - path: ./docs/style-guide.md
+      note: Brand tone reference.       # note is optional
+    - path: ./examples/gold-standard/*.md
+  expert_notes: |
+    Prefer active voice. Lead with the recommendation.
+```
+
+Validation rules: `context` (if present) is an object; `references` (if present)
+is a list of objects each with a non-empty string `path`; `expert_notes` (if
+present) is a string. The block is entirely optional.
+
+**Sign-off checkpoints.** The human-in-the-loop flow pauses at three points,
+using `AskUserQuestion` to surface a diff/summary and accept approve / edit /
+reject: (1) after draft criteria, before finalizing; (2) after the first
+test-eval run, before trusting the rubric; (3) before patching a target skill.
+Each decision is appended to `.claude/eval-results/<rubric>/feedback.md` by
+`skills/_shared/feedback.py` for an audit trail.
+
+Because `AskUserQuestion` needs the live conversation, sign-off skills run
+**inline**, not with `context: fork`. Autonomous/background loops instead set
+`disallowed-tools: AskUserQuestion` so they never block waiting on a human.
+
 ## Supported check types
 
 | Type | Purpose |

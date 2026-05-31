@@ -150,6 +150,23 @@ The inserted section must include:
 
 Use the snippet in `snippets/eval-gate-section.md` as a base.
 
+### Step 3.5 — Sign-off checkpoint (before patching)
+
+Patching a target skill is a side effect. Before writing changes, surface the
+target path, the rubric, the thresholds, and the loop mode/automation, and use
+`AskUserQuestion` to get approve / edit / reject. After the first test-eval run,
+pause again before trusting the rubric. Record each decision:
+
+```bash
+python .claude/skills/_shared/feedback.py \
+  --rubric <name> --stage pre-patch --decision <approve|edit|reject> --text "<note>"
+```
+
+Run sign-off **inline** (never `context: fork`). In `--autonomous` runs there is
+no human to ask, so those loops set `disallowed-tools: AskUserQuestion` and rely
+on the circuit breakers instead — only choose autonomous when the user has
+authorized unattended iteration.
+
 ### Step 4 — Add scripts if requested or useful
 
 When script-backed/hybrid mode is selected, add scripts under the target skill's parent directory:
