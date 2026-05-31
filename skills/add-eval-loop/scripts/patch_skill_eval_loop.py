@@ -7,7 +7,12 @@ This helper is intentionally conservative: it only inserts/replaces content betw
 from __future__ import annotations
 
 import argparse
+import shutil
 from pathlib import Path
+
+# Source locations within the plugin, resolved relative to this script.
+_SCRIPTS_DIR = Path(__file__).resolve().parent
+_SHARED_DIR = _SCRIPTS_DIR.parents[1] / "_shared"
 
 START = "<!-- eval-loop:start -->"
 END = "<!-- eval-loop:end -->"
@@ -53,6 +58,22 @@ AND no critical barrier is triggered
 - Do not hide evaluator uncertainty.
 - Keep a brief score history when scripts or files are available.
 
+### Running the scripted gate (script-backed / hybrid)
+
+Bundled scripts are referenced via `${{{{CLAUDE_SKILL_DIR}}}}` so they run regardless
+of the current working directory:
+
+```bash
+python "${{{{CLAUDE_SKILL_DIR}}}}/scripts/eval_runner.py" \\
+  "${{{{CLAUDE_SKILL_DIR}}}}/eval/eval-cases.json" \\
+  --out "${{{{CLAUDE_SKILL_DIR}}}}/eval/results/latest.json"
+
+# Iterate. Agent mode (default) writes an improvement prompt and stops;
+# add --autonomous --model-cmd "claude -p" to close the loop.
+python "${{{{CLAUDE_SKILL_DIR}}}}/scripts/improve_skill_loop.py" \\
+  --mode output --target <artifact> --threshold 0.95
+```
+
 {END}
 """
 
@@ -81,6 +102,18 @@ def scaffold_scripts(skill_dir: Path) -> None:
     scripts.mkdir(parents=True, exist_ok=True)
     eval_dir.mkdir(parents=True, exist_ok=True)
     (eval_dir / ".gitkeep").write_text("", encoding="utf-8")
+
+    # Vendor the runner scripts and the shared core so the patched skill is
+    # self-contained and runnable without the plugin on the path.
+    for src in (
+        _SHARED_DIR / "eval_core.py",
+        _SHARED_DIR / "feedback.py",
+        _SCRIPTS_DIR / "eval_runner.py",
+        _SCRIPTS_DIR / "improve_skill_loop.py",
+    ):
+        if src.exists():
+            shutil.copy2(src, scripts / src.name)
+
     cases = skill_dir / "eval" / "eval-cases.json"
     if not cases.exists():
         cases.write_text("""[

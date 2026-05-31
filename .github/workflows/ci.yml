@@ -1,0 +1,32 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - 'claude/**'
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run test suite
+        run: python -m pytest
+
+      - name: Validate composite rubric template
+        run: python skills/create-rubric/scripts/validate_rubric.py skills/create-rubric/templates/composite-rubric.yaml
+
+      - name: Preflight readiness check
+        run: python skills/build-eval-loop/scripts/preflight.py --target skills/create-rubric/SKILL.md --rubric skills/create-rubric/templates/composite-rubric.yaml
