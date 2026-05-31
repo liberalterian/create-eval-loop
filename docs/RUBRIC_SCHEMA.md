@@ -57,14 +57,17 @@ reporting:
 | `binary` | Human/LLM-readable yes/no checklist item. |
 | `presence` | Required string, regex, section, field, or pattern must exist. |
 | `absence` | Forbidden string, regex, or pattern must not exist. |
-| `pattern` | Output must match a structural pattern. |
+| `pattern` | Output must fully match a structural regex pattern. |
+| `regex` | A regex pattern must be found somewhere in the output. |
 | `exact` | Output exactly equals a value. Useful for classifiers. |
 | `contains` | Output contains a value. |
 | `not_contains` | Output does not contain a value. |
 | `min_length` | Output length is at least a minimum. |
 | `max_length` | Output length is under a maximum. |
-| `json_schema` | Output parses as JSON and contains required keys. |
+| `json_schema` | Output parses as JSON and contains a required dotted key path. Alias: `json_key`. |
 | `custom` | LLM-as-judge or human evaluator prompt. Use sparingly. |
+
+The deterministic types (everything except `binary` and `custom`) are implemented by `skills/_shared/eval_core.py`; `eval_core.ASSERTION_TYPES` is the canonical list.
 
 ## Evaluation result shape
 

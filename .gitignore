@@ -1,1 +1,14 @@
-!**/__pycache__/
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+
+# Windows "mark of the web" sidecar files
+*:Zone.Identifier
+
+# Eval run artifacts (history is written at runtime, not committed)
+eval-test-results.json
+test-results.json
+**/eval/results/
+.claude/eval-results/

@@ -4,7 +4,7 @@
 
 Before returning final output, run a rubric-based quality gate.
 
-**Rubric:** `{rubric_path}`  
+**Rubric:** `{rubric}`  
 **Mode:** `{mode}`  
 **Overall threshold:** `{threshold}` / 100  
 **Per-criterion floor:** `{floor}` / 100  
