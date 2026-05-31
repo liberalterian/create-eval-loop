@@ -50,6 +50,54 @@ reporting:
   output_dir: .claude/eval-results
 ```
 
+## Multimodal (composite) rubrics
+
+A rubric can group criteria into **sections**, each scored with its own method.
+This lets a single rubric combine, for example, a deterministic must-pass
+checklist with a subjective level-anchor craft assessment.
+
+```yaml
+rubric_type: composite
+sections:
+  must_pass:
+    type: checklist        # one method per section
+    weight: 60             # section weights sum to 100
+    criteria:
+      requirements_met:
+        weight: 60         # criteria weights sum to 100 *within the section*
+        threshold: 80
+        # ... checks ...
+  craft:
+    type: level_anchor
+    weight: 40
+    criteria:
+      clarity:
+        weight: 100
+        # ... anchors ...
+passing:
+  min_score: 85
+  required_sections: [must_pass]   # a section that must pass on its own
+  required_criteria: [requirements_met]
+  critical_barriers: [...]
+```
+
+**Aggregation contract.** Within a section, each criterion is scored 0-100 by
+its method; the section score is the weighted average of its criteria. The
+overall score is the weighted average of section scores. Per-criterion floors
+apply within their section. A failed `required_section`, a failed
+`required_criterion`, a floor violation, or a triggered `critical_barrier`
+hard-fails the rubric regardless of the overall score.
+
+**Backward compatibility.** A flat rubric with a top-level `criteria:` block and
+no `sections:` is treated as one implicit section weighted 100, typed by
+`rubric_type`. Existing flat rubrics validate and score unchanged.
+`required_sections` is only valid when `sections:` is present.
+
+Validation enforces two levels of weights: section weights sum to 100, and each
+section's criteria weights sum to 100. See
+`skills/_shared/eval_core.py::normalize_sections` and `score_rubric` for the
+reference implementation.
+
 ## Supported check types
 
 | Type | Purpose |

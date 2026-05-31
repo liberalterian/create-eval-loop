@@ -1,0 +1,96 @@
+name: example-composite-rubric
+version: 1.0.0
+description: >
+  Multimodal (composite) rubric template. Combines a deterministic must-pass
+  checklist section with a craft section scored on level anchors. Section
+  weights sum to 100, and the criteria within each section sum to 100.
+scope:
+  type: content
+  file_patterns:
+    - "*.md"
+rubric_type: composite
+scoring:
+  scale: 0-100
+  aggregation: weighted_average
+  threshold: 85
+  per_criterion_floor: 70
+  max_rounds: 4
+  convergence:
+    min_delta: 2
+    patience: 2
+sections:
+  must_pass:
+    type: checklist
+    weight: 60
+    description: Non-negotiable correctness and safety requirements.
+    criteria:
+      requirements_met:
+        weight: 60
+        threshold: 80
+        description: The output satisfies every explicit requirement.
+        method: checklist
+        checks:
+          - id: addresses-request
+            type: binary
+            statement: The output directly addresses the main user request.
+            message: Revise so the output directly answers the request.
+          - id: covers-components
+            type: binary
+            statement: The output covers every required component named by the user.
+            message: Add the missing requested components.
+      safety_grounding:
+        weight: 40
+        threshold: 80
+        description: Claims are accurate and nothing unsafe or fabricated is present.
+        method: checklist
+        checks:
+          - id: no-fabrication
+            type: binary
+            statement: The output contains no fabricated sources, tools, or results.
+            message: Remove or verify any fabricated content.
+          - id: uncertainty-stated
+            type: binary
+            statement: The output states uncertainty instead of guessing.
+            message: Add an uncertainty note for incomplete information.
+  craft:
+    type: level_anchor
+    weight: 40
+    description: Subjective quality dimensions scored against level anchors.
+    criteria:
+      clarity:
+        weight: 50
+        threshold: 50
+        description: How clear and well-structured the output is.
+        method: level_anchor
+        anchors:
+          "0": Incoherent or unstructured.
+          "25": Understandable but poorly organized.
+          "50": Clear with adequate structure.
+          "75": Well organized and easy to follow.
+          "100": Exceptionally clear; structure aids comprehension throughout.
+      tone:
+        weight: 50
+        threshold: 50
+        description: How well the tone matches the intended audience.
+        method: level_anchor
+        anchors:
+          "0": Tone is inappropriate for the audience.
+          "25": Tone is inconsistent.
+          "50": Tone is acceptable for the audience.
+          "75": Tone is well matched and consistent.
+          "100": Tone is precisely calibrated to the audience throughout.
+passing:
+  min_score: 85
+  required_sections:
+    - must_pass
+  required_criteria:
+    - requirements_met
+  critical_barriers:
+    - id: fabricated-source
+      section: must_pass
+      criterion: safety_grounding
+      condition: Any fabricated citation or source reference is present.
+      consequence: Fail output and require correction before acceptance.
+reporting:
+  save_history: true
+  output_dir: .claude/eval-results/example-composite-rubric

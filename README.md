@@ -16,6 +16,7 @@ rubric-eval-loop-plugin/
 │   │   ├── templates/
 │   │   │   ├── checklist-rubric.yaml
 │   │   │   ├── level-anchor-rubric.yaml
+│   │   │   ├── composite-rubric.yaml
 │   │   │   └── eval-cases.json
 │   │   └── scripts/
 │   │       └── validate_rubric.py

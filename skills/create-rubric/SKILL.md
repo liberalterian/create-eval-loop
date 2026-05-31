@@ -60,6 +60,17 @@ Prefer the simplest rubric that can reliably drive the decision.
 | `pairwise` | Choosing best of several outputs | Compare candidates against the same criteria; require rationale. |
 | `batch_lift` | Improving many generated items | Judge all, regenerate bottom N%, re-judge, report lift. |
 | `test_driven` | Code or structured output | Generate or use tests, run them, fix failures. |
+| `composite` | Outputs that need multiple methods at once | Group criteria into weighted `sections`, each with its own method (e.g. a must-pass checklist + a level-anchor craft section). |
+
+Use a **composite** rubric when one method cannot capture the decision — for
+example, a deterministic must-pass section plus a subjective craft section.
+Rules for sections:
+
+- Each section declares a single `type` (its method) and a `weight`; section
+  weights sum to 100.
+- Criteria weights sum to 100 *within each section*.
+- Mark sections that must pass on their own in `passing.required_sections`.
+- Start from `templates/composite-rubric.yaml`.
 
 ### Phase 3 — Draft criteria
 
